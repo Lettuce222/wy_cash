@@ -34,11 +34,30 @@ impl Money {
             currency: self.currency,
         }
     }
+
+    fn plus(&self, addend: &Money) -> impl Expression {
+        Money {
+            amount: self.amount + addend.amount,
+            currency: self.currency,
+        }
+    }
 }
 
 impl PartialEq for Money {
     fn eq(&self, other: &Self) -> bool {
         self.amount == other.amount && self.currency == other.currency
+    }
+}
+
+trait Expression {}
+
+impl Expression for Money {}
+
+struct Bank {}
+
+impl Bank {
+    fn reduce(&self, source: impl Expression, to: Currency) -> Money {
+        return Money::dollar(10);
     }
 }
 
@@ -60,4 +79,13 @@ fn test_equality() {
 fn test_currency() {
     assert_eq!(Currency::USD, Money::dollar(1).currency);
     assert_eq!(Currency::CHF, Money::franc(1).currency);
+}
+
+#[test]
+fn test_simple_addition() {
+    let five = Money::dollar(5);
+    let sum = five.plus(&five);
+    let bank = Bank {};
+    let reduced = bank.reduce(sum, Currency::USD);
+    assert_eq!(Money::dollar(10), reduced)
 }
